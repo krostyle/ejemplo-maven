@@ -5,7 +5,7 @@ def jsonParse(def json) {
 pipeline {
     agent any
     stages {
-        stage("Paso 1: Compliar"){
+        stage("Paso 1: Compilar"){
             steps {
                 script {
                 sh "echo 'Compile Code!'"
@@ -29,6 +29,22 @@ pipeline {
                 sh "echo 'Build .Jar!'"
                 // Run Maven on a Unix agent.
                 sh "./mvnw clean package -e"
+                }
+            }
+        }
+        stage("Paso 4: Run .Jar"){
+            steps {
+                script {
+                sh "echo 'Running .Jar file!'"
+                sh "./mvnw spring-boot:run &"
+                }
+            }
+        }
+        stage("Paso 5: Build .Jar"){
+            steps {
+                script {
+                    sh "sleep 30"
+                    sh "curl -X GET 'http://localhost:8081/rest/mscovid/estadoPais?pais=Argentina'"
                 }
             }
         }
