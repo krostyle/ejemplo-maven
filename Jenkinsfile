@@ -5,30 +5,46 @@ def jsonParse(def json) {
 pipeline {
     agent any
     stages {
-        stage("Paso 1: Saludar"){
+        stage("Paso 1: Compilar"){
             steps {
                 script {
-                sh "echo 'Hello, World Usach!'"
+                sh "echo 'Compile Code!'"
+                // Run Maven on a Unix agent.
+                sh "./mvnw clean compile -e"
                 }
             }
         }
-        stage("Paso 2: Crear Archivo"){
+        stage("Paso 2: Testear"){
             steps {
                 script {
-                sh "echo 'Hello, World Usach!!' > hello-devops-usach-.txt"
+                sh "echo 'Test Code!'"
+                // Run Maven on a Unix agent.
+                sh "./mvnw clean test -e"
                 }
             }
         }
-        stage("Paso 3: Guardar Archivo"){
+        stage("Paso 3: Build .Jar"){
             steps {
                 script {
-                sh "echo 'Persisitir Archivo!'"
+                sh "echo 'Build .Jar!'"
+                // Run Maven on a Unix agent.
+                sh "./mvnw clean package -e"
                 }
             }
-            post {
-                //record the test results and archive the jar file.
-                success {
-                    archiveArtifacts(artifacts:'**/*.txt', followSymlinks:false)
+        }
+        stage("Paso 4: Run .Jar"){
+            steps {
+                script {
+                sh "echo 'Running .Jar file!'"
+                sh "./mvnw spring-boot:run &"
+                }
+            }
+        }
+        stage("Paso 5: Build .Jar"){
+            steps {
+                script {
+                    sh "sleep 30"
+                    sh "curl -X GET 'http://localhost:8081/rest/mscovid/estadoPais?pais=Argentina'"
                 }
             }
         }
